@@ -1,0 +1,16 @@
+[package]
+name = "firewatcher"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+diesel = { version = "2.0.0", features = ["postgres", "chrono", "serde_json", "r2d2"] }
+chrono = "0.4.23"
+serde_json = "1.0"
+dotenvy = "0.15"
+reqwest = { version = "0.11", features = ["json"] }
+tokio = { version = "1", features = ["full"] }
+console = "0.15.2"
+dialoguer = "0.10.2"
