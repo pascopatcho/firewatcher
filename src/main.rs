@@ -60,7 +60,7 @@ fn database_configuration_wizard(term: &Term) -> Result<String> {
     let database_name: String = Input::new()
         .with_prompt("Enter PostgreSQL database name")
         .default("firewatcher".into())
-        .interact()?;
+        .interact_on(term)?;
     
     //TODO: Save the database url in the .env file for later use
 
@@ -69,9 +69,10 @@ fn database_configuration_wizard(term: &Term) -> Result<String> {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    dotenv().ok();
+    dotenv().unwrap(); // TODO: Panick more nicely
     let term = Term::stdout();
     print_header(&term)?;
+
     let database_url = env::var("DATABASE_URL").or_else(|_| {
         term.write_line("[+] Database configuration not found.")?;
         database_configuration_wizard(&term)
