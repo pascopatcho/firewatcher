@@ -2,8 +2,8 @@
 name = "firewatcher"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+license = "AGPL-3.0-only"
+description = "A social network scraper"
 
 [dependencies]
 diesel = { version = "2.0.0", features = ["postgres", "chrono", "serde_json", "r2d2"] }
