@@ -1,19 +1,18 @@
-mod models;
 mod schema;
+mod twitter;
 
 use console::Term;
 use dialoguer::{Input, Password};
 use diesel::pg::PgConnection;
-use diesel::prelude::*;
-use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
+use diesel::r2d2::{ConnectionManager, Pool};
 use dotenvy::dotenv;
 use std::env;
-use std::io::{stdout, Result, Write};
+use std::io::Result;
 
-type PgPool = Pool<ConnectionManager<PgConnection>>;
+type DbPool = Pool<ConnectionManager<PgConnection>>;
 
 // TODO: Return a Result instead of panicking
-fn establish_connection_pool(term: &Term, db_url: &str) -> PgPool {
+fn establish_connection_pool(term: &Term, db_url: &str) -> DbPool {
     term.write_line("[+] Connecting to database...").unwrap();
     let manager = ConnectionManager::<PgConnection>::new(db_url);
 
@@ -37,7 +36,7 @@ fn print_header(term: &Term) -> Result<()> {
 }
 
 fn database_configuration_wizard(term: &Term) -> Result<String> {
-    term.write_line("[+] Starting configuration wizard.")?;
+    term.write_line("[+] Starting database configuration wizard.")?;
     term.write_line("")?;
 
     let hostname: String = Input::new()
@@ -71,6 +70,11 @@ fn database_configuration_wizard(term: &Term) -> Result<String> {
     ))
 }
 
+fn twitter_credentials_wizard(term: &Term, db_pool: &DbPool) -> Result<()> {
+    term.write_line("[+] Starting twitter credentials wizard.")?;
+    Ok(())
+}
+
 #[tokio::main]
 async fn main() -> Result<()> {
     dotenv().unwrap(); // TODO: Panick more nicely
@@ -83,6 +87,16 @@ async fn main() -> Result<()> {
     })?;
 
     let db_pool = establish_connection_pool(&term, &database_url);
+
+    let twitter_credentials_count = {
+        let credentials_manager = twitter::CredentialsManager::new(&db_pool);
+        credentials_manager.count().unwrap() // TODO: panick more nicely
+    };
+
+    if twitter_credentials_count <= 0 {
+        term.write_line("[+] No twitter credentials found.")?;
+        twitter_credentials_wizard(&term, &db_pool)?;
+    }
 
     Ok(())
 }
