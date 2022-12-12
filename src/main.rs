@@ -1,15 +1,14 @@
 mod models;
 mod schema;
 
-use diesel::pg::PgConnection;
-use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
-use diesel::prelude::*;
-use dotenvy::dotenv;
-use std::env;
-use std::io::{stdout, Write, Result};
 use console::Term;
 use dialoguer::{Input, Password};
-
+use diesel::pg::PgConnection;
+use diesel::prelude::*;
+use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
+use dotenvy::dotenv;
+use std::env;
+use std::io::{stdout, Result, Write};
 
 type PgPool = Pool<ConnectionManager<PgConnection>>;
 
@@ -17,7 +16,10 @@ type PgPool = Pool<ConnectionManager<PgConnection>>;
 fn establish_connection_pool(term: &Term, db_url: &str) -> PgPool {
     term.write_line("[+] Connecting to database...").unwrap();
     let manager = ConnectionManager::<PgConnection>::new(db_url);
-        Pool::new(manager).expect("Postgres connection pool could not be created")
+
+    Pool::builder()
+        .build(manager)
+        .expect("Postgres connection pool could not be created")
 }
 
 fn print_header(term: &Term) -> Result<()> {
@@ -42,29 +44,31 @@ fn database_configuration_wizard(term: &Term) -> Result<String> {
         .with_prompt("Enter PostgreSQL hostname")
         .default("localhost".into())
         .interact_on(term)?;
-    
+
     let port: String = Input::new()
         .with_prompt("Enter PostgreSQL port")
         .default("5432".into())
         .interact_on(term)?;
-    
+
     let username: String = Input::new()
         .with_prompt("Enter PostgreSQL username")
         .default("firewatcher".into())
         .interact_on(term)?;
-    
+
     let password: String = Password::new()
         .with_prompt("Enter PosgreSQL password")
         .interact_on(term)?;
-    
+
     let database_name: String = Input::new()
         .with_prompt("Enter PostgreSQL database name")
         .default("firewatcher".into())
         .interact_on(term)?;
-    
+
     //TODO: Save the database url in the .env file for later use
 
-    Ok(format!("postgres://{username}:{password}@{hostname}:{port}/{database_name}"))
+    Ok(format!(
+        "postgres://{username}:{password}@{hostname}:{port}/{database_name}"
+    ))
 }
 
 #[tokio::main]

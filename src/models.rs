@@ -1,7 +1,7 @@
-use diesel::prelude::*;
-use chrono::prelude::*;
-use serde_json::Value as JsonValue;
 use crate::schema::{twitter_accounts, twitter_credentials};
+use chrono::prelude::*;
+use diesel::prelude::*;
+use serde_json::Value as JsonValue;
 
 #[derive(Queryable)]
 pub struct TwitterAccount {

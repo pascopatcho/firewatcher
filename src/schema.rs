@@ -26,7 +26,4 @@ diesel::table! {
     }
 }
 
-diesel::allow_tables_to_appear_in_same_query!(
-    twitter_accounts,
-    twitter_credentials,
-);
+diesel::allow_tables_to_appear_in_same_query!(twitter_accounts, twitter_credentials,);
