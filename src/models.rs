@@ -1,7 +1,7 @@
 use diesel::prelude::*;
 use chrono::prelude::*;
 use serde_json::Value as JsonValue;
-use crate::schema::twitter_accounts;
+use crate::schema::{twitter_accounts, twitter_credentials};
 
 #[derive(Queryable)]
 pub struct TwitterAccount {
@@ -36,4 +36,19 @@ pub struct NewTwitterAccount<'a> {
     pub url: Option<&'a str>,
     pub verified: bool,
     pub withheld: Option<&'a JsonValue>,
+}
+
+#[derive(Queryable)]
+pub struct TwitterCredential {
+    pub name: String,
+    pub consumer_key: String,
+    pub consumer_secret: String,
+}
+
+#[derive(Insertable)]
+#[diesel(table_name = twitter_credentials)]
+pub struct NewTwitterCredential<'a> {
+    pub name: &'a str,
+    pub consumer_key: &'a str,
+    pub consumer_secret: &'a str,
 }
